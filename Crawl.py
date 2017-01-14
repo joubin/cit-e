@@ -1,31 +1,43 @@
-from ssl import CertificateError
-from urllib import parse, request, error
-
+from urllib import parse, robotparser
 import tldextract
-
+import sys, time
 from Page import Page
+from Utils import URL as URL_URLS
 
 
 class Crawl:
+    obey_robot = True
+
     def __init__(self, base_domain: str = None):
         self.__base_domain = base_domain
         self.__urls = dict()
+        self.__rp = robotparser.RobotFileParser()
+        self.__rp.set_url(base_domain + "/robots.txt")
+        self.__rp.read()
+        self.__delay = self.__rp.crawl_delay(URL_URLS.get_useragent())
+        if self.__delay is None:
+            self.__delay = float(0)
+        else:
+            self.__delay = float(self.__delay)
+
+        print(self.__delay)
 
     def get_base_domain(self):
         return self.__base_domain
 
     def crawl(self, url: str = None):
-        print("Going in")
+        time.sleep(self.__delay)
         if url is None:
             url = self.__base_domain
         if url is "#" or self.is_x_in_y(url) or url.endswith(".pdf"):
             return
-        print("Url", url)
+        if Crawl.obey_robot:
+            if not self.__rp.can_fetch("*", url):
+                return
+
         page = Page(url)
         self.set_done_scanning(url)
-        print(len(page.get_links()))
         for link in page.get_links():
-            print("-->", link)
             self.add_new_url(link)
             self.crawl(link)
 
@@ -56,15 +68,11 @@ class Crawl:
 
 
 if __name__ == '__main__':
-    import sys, time
 
     start = time.time()
     sys.setrecursionlimit(sys.getrecursionlimit() * 2)
-    crawl = Crawl("http://jabbari.io")
+    crawl = Crawl("https://uber.com")
     crawl.crawl()
     end = time.time()
     print(crawl.get_url_count())
     print("Took ", (end - start), " seconds")
-    # page = Page("https://jabbari.io/blog.php")
-    # print(page.get_links())
-    # crawl.print_urls()

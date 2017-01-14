@@ -8,8 +8,9 @@ class URL:
     __opener = request.build_opener()
     __opener.addheaders = [('User-Agent', 'https://jabbari.io/contact.php')]
 
+
     @classmethod
-    def get_content_of_url(cls, url : str = None) -> str:
+    def get_content_of_url(cls, url: str = None) -> str:
         return cls.__opener.open(url).read()
 
     @staticmethod
@@ -28,17 +29,41 @@ class URL:
         else:
             return parse.urlsplit(base).netloc == parse.urlsplit(url).netloc
 
+    @staticmethod
+    def url_to_file(url: str = None) -> str:
+        return IO.url_to_file(url)
+
+    @classmethod
+    def get_useragent(cls):
+        return cls.__opener.addheaders[0][1]
+
 
 class IO:
-    @staticmethod
-    def get_html_cache_dir():
-        return "html"
+    read_cache = True
+    path = "html"
+
+    @classmethod
+    def get_html_cache_dir(cls):
+        if not os.path.exists(cls.path):
+            os.mkdir(cls.path)
+        return cls.path
 
     @staticmethod
     def get_html_cache_with_file(file):
         return os.path.join(IO.get_html_cache_dir(), file)
 
+    @classmethod
+    def write_to_file(cls) -> bool:
+        return not cls.read_cache
+
+    @staticmethod
+    def url_to_file(url: str = None) -> str:
+        return url.replace("https://", "https-").replace("http://", "http-").replace('/', '<>')
+
+    @staticmethod
+    def cached_file_exists(url: str = None) -> bool:
+        return os.path.exists(IO.get_html_cache_with_file(url))
+
 
 if __name__ == '__main__':
-    # print(URL.validate_url("https://google.com"))
     print(URL.dosomething())
