@@ -99,6 +99,9 @@ class Page:
                     mode='w+') as file:
                 file.write(self.get_response(pretty=True))
 
+    def get_child_url(self, url:str)->str:
+        URL_UTIL.make_url_from_base(self.url, url)
+
 
 if __name__ == '__main__':
     page = Page("https://jabbari.io/contact.php")

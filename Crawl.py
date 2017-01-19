@@ -1,6 +1,6 @@
 from urllib import parse, robotparser
 import tldextract
-import sys, time, sqlite3, os, hashlib
+import sys, time, sqlite3, os
 from  sqlite3 import IntegrityError
 
 from Page import Page
