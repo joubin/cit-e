@@ -1,4 +1,4 @@
-import os
+import os, hashlib
 
 from tldextract import tldextract
 from urllib import parse, request
@@ -7,7 +7,6 @@ from urllib import parse, request
 class URL:
     __opener = request.build_opener()
     __opener.addheaders = [('User-Agent', 'https://jabbari.io/contact.php')]
-
 
     @classmethod
     def get_content_of_url(cls, url: str = None) -> str:
@@ -41,6 +40,7 @@ class URL:
 class IO:
     read_cache = True
     path = "html"
+    hashlib = hashlib.sha256
 
     @classmethod
     def get_html_cache_dir(cls):
@@ -52,10 +52,6 @@ class IO:
     def get_html_cache_with_file(file):
         return os.path.join(IO.get_html_cache_dir(), file)
 
-    @classmethod
-    def write_to_file(cls) -> bool:
-        return not cls.read_cache
-
     @staticmethod
     def url_to_file(url: str = None) -> str:
         return url.replace("https://", "https-").replace("http://", "http-").replace('/', '<>')
@@ -64,6 +60,7 @@ class IO:
     def cached_file_exists(url: str = None) -> bool:
         return os.path.exists(IO.get_html_cache_with_file(url))
 
+    @staticmethod
+    def hash_file_name(filename: str = None) -> str:
+        return hashlib.sha256(filename.encode("UTF-8")).hexdigest()
 
-if __name__ == '__main__':
-    print(URL.dosomething())
