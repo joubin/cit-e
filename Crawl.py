@@ -37,7 +37,7 @@ class Crawl:
             self.__conn = sqlite3.connect(db)
             self.__conn.execute(
                 '''CREATE TABLE pages
-                (id integer primary key, url string UNIQUE, path, has_forms BOOL, has_links bool)''')
+                (id integer primary key, url string UNIQUE, path, has_forms BOOL, has_links bool, has_input bool)''')
             self.__conn.execute('''CREATE TABLE forms (id integer primary key, pageid integer, method, action)''')
             self.__conn.execute('''CREATE TABLE links (id integer primary key, pageid, parentid)''')
         except Exception:
@@ -74,9 +74,9 @@ class Crawl:
     def add_new_page(self, page: Page) -> None:
         try:
             with self.__conn as con:
-                con.execute('insert into pages(url, path, has_forms, has_links) values (?, ?, ?, ?)',
+                con.execute('insert into pages(url, path, has_forms, has_links, has_input) values (?, ?, ?, ?, ?)',
                             (page.url, IOUTILS.get_html_cache_with_file(IOUTILS.hash_file_name(page.url)),
-                             page.has_forms(), page.has_links()))
+                             page.has_forms(), page.has_links(), page.has_input()))
         except IntegrityError as e:
             pass
 
